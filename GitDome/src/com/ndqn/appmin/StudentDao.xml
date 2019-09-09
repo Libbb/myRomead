@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csdj.dao.StudentDao">
+
+	<resultMap type="Student" id="studentMap">
+		<id column="id" property="id"/>
+		<result column="studentName" property="studentName"/>
+		<result column="age" property="age"/>
+		<result column="phone" property="phone"/>
+		<result column="address" property="address"/>
+		<result column="createTime" property="createTime"/>
+		<!-- 外键对象 -->
+		<association property="grade" column="gradeid" select="com.csdj.dao.GradeDao.findBid">
+		
+		</association>
+	</resultMap>
+
+   <!-- 查询年级 -->  
+    <select id="StudentSelect" resultMap="studentMap">
+  		 select * from  Student 
+    </select>
+    
+    <!-- 根据id查询年级 -->  
+    <select id="findBid" parameterType="int" resultMap="studentMap" >
+  		 select * from  Student where id=#{id}
+    </select>
+    
+    <!-- 分页查询年级 -->  
+    <select id="findPage" parameterType="map" resultMap="studentMap">
+  		 select * from  Student
+  		 <where>
+  		 	<if test="gradeid!=null">
+  		 		gradeid=#{gradeid}
+  		 	</if>
+  		 	<if test="studentName!=null">
+  		 	 	and studentName like #{studentName}
+  		 	</if>
+  		 </where>
+  		  limit #{off},#{size}
+    </select>
+    
+    <!-- 查询年级总数 -->  
+    <select id="Count"  resultType="int" parameterType="map">
+  		 select count(*) from  Student 
+  		  <where>
+  		 	<if test="gradeid!=null">
+  		 		gradeid=#{gradeid}
+  		 	</if>
+  		 		
+  		 	<if test="studentName!=null">
+  		 	 	and studentName like #{studentName}
+  		 	</if>
+  		 </where>
+    </select>
+    
+    <!-- 根据id删除 -->
+    <delete id="Delete" parameterType="int">
+    	delete from Student where id=#{id}
+    </delete>
+    
+    <!-- 根据id修改-->
+    <update id="Update" parameterType="Student">
+    	UPDATE student SET studentName=#{studentName},age=#{age},phone=#{phone},address=#{address},createTime=#{createTime},gradeid=#{grade.id} WHERE id=#{id}
+	   
+    </update>
+    
+    <!-- 添加方法 -->
+    <insert id="add" parameterType="Student">
+    	insert into Student(studentName,age,phone,address, createTime,gradeid)values
+    	(#{studentName},#{age},#{phone},#{address},#{createTime},#{grade.id})
+    </insert>
+</mapper>

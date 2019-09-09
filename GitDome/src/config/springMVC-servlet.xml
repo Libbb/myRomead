@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+	
+		<!-- 启动注解配置 -->
+		<mvc:annotation-driven/>
+		
+		<!-- 把指定目录下控制器扫描到IOC容器 -->
+		<context:component-scan base-package="com.csdj.controller"/>
+		
+		<!--视图管理器  -->
+		<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!--前缀 配置-->
+		<property name="prefix" value="/"></property>
+		<!-- 后缀 配置-->
+		<property name="suffix" value=".jsp"></property>
+		</bean>
+		
+		<!-- 数据校验 -->
+		<!-- 配置验证消息 -->
+		<bean id="validationMessageSource" 
+		   class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		</bean>
+		<!-- 数据校验器 -->
+		<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+			<!--加载hibernate的验证类  -->
+			<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+			<!-- 配置验证消息对象引用 -->
+			<property name="validationMessageSource" ref="validationMessageSource"/>
+		</bean>
+		
+		<!-- 静态资源管理器 -->
+		<mvc:default-servlet-handler/>
+		<!-- 上传文件配置解析器 -->
+		<!-- 文件上传的多部分解析器 -->
+		<bean id="multipartResolver"
+			class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+			<!-- 设置上传文件的大小，如果同时传多个文件，则是所有文件的大小 -->
+			<property name="maxUploadSize" value="4000000" />
+			<!-- 字符编码的设置，默认是ISO-8859 -->
+			<property name="defaultEncoding" value="utf-8" />
+		</bean>
+			
+			<!-- 配置SpringMVC框架运行所抛出的异常处理 -->
+		<bean id="exceptionResolver" 
+		   class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+			<property name="exceptionMappings">
+				<props>
+					<!-- 配置捕获什么类型的异常， MaxUploadSizeExceededException， /errorFile 是转跳的URL -->
+					<prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">
+						   /errorFile
+					</prop>				
+				</props>
+			</property>
+		</bean>
+</beans>
